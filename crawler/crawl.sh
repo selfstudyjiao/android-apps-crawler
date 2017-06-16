@@ -1,4 +1,3 @@
-#!/bin/sh
 if [ $# -le 0 ]
 then
     echo "Usage: $0 <market name> [database output directory]"

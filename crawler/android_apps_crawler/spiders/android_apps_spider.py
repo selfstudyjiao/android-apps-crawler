@@ -1,13 +1,20 @@
 import re
 
-from scrapy.spider import Spider
+from scrapy.spiders import Spider
 from scrapy.selector import Selector
 from scrapy.http import Request
 from scrapy.http import HtmlResponse
 from scrapy import log
 
-from urlparse import urlparse
-from urlparse import urljoin
+try:
+   import urlparse
+except ImportError:
+   import urllib.parse as urlparse
+try:
+   from urlparse import urljoin
+except ImportError:
+   from urllib.parse import urljoin
+
 
 from android_apps_crawler.items import AppItem
 from android_apps_crawler import settings

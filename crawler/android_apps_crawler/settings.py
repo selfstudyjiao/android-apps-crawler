@@ -12,13 +12,17 @@ SPIDER_MODULES = ['android_apps_crawler.spiders']
 NEWSPIDER_MODULE = 'android_apps_crawler.spiders'
 USER_AGENT = "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.11(KHTML, like Gecko) Chrome/23.0.1271.97 Safari/537.11"
 ITEM_PIPELINES = {
-    'android_apps_crawler.pipelines.AppPipeline': 1,
-    'android_apps_crawler.pipelines.SQLitePipeline': 2,
+        'android_apps_crawler.pipelines.AppPipeline' : 1,
 }
+MONGODB_HOST= '127.0.0.1'
+MONGODB_PORT = 27017
+MONGODB_DBNAME= 'GPLAY'
+MONGODB_DOCNAME= 'Apps'
+
 LOG_LEVEL = 'INFO'
-DOWNLOADER_MIDDLEWARES = {
-    'android_apps_crawler.middlewares.DownloaderMiddleware': 1,
-}
+# DOWNLOADER_MIDDLEWARES = {
+#     'android_apps_crawler.middlewares.DownloaderMiddleware': 1,
+# }
 
 # Uncomment following statement to use proxy.
 # PROXIES = {
@@ -43,7 +47,7 @@ ALLOWED_DOMAINS = {
 }
 START_URLS = {
     "appchina.com" : ["http://www.appchina.com",],
-    "hiapk.com"    : ["http://apk.hiapk.com",],
+    "hiapk.com"    : ["http://apk.hiapk.com/himarket",],
     "anzhi.com"    : ["http://www.anzhi.com",],
     "android.d.cn" : ["http://android.d.cn",],
     "mumayi.com"   : ["http://www.mumayi.com",],
@@ -60,7 +64,7 @@ START_URLS = {
 SCRAPE_RULES = {
     "xpath" : {
         "appchina"     : "//a[@class='download-pc fl']/@href",
-        "hiapk"        : "//a[@class='link_btn']/@href",
+        "hiapk"        : "//a[@id='appInfoDownUrl']/@href",
         "android.d.cn" : "//a[@class='localDownload']/@href",
         "mumayi"       : "//a[@class='download fl']/@href",
         "gfan"         : "//a[@id='computerLoad']/@href",

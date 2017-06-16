@@ -6,6 +6,5 @@ class DownloaderMiddleware(object):
             request.meta["proxy"] = spider.settings['PROXIES']['http']
         if request.url[-3:].lower() in ["apk", "png", "jpg", "exe", "doc",
                 "zip", "rar"]:
-            print "Ignore request!"
+            print ("Ignore request!")
             raise IgnoreRequest
-

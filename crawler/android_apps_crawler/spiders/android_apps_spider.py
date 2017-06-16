@@ -7,7 +7,6 @@ from scrapy.linkextractors import LinkExtractor
 from scrapy.selector import Selector
 from scrapy.http import Request
 from scrapy.http import HtmlResponse
-from scrapy import log
 
 try:
    import urlparse
@@ -57,10 +56,6 @@ class AndroidAppsSpider(CrawlSpider):
                 appItemList.extend(
                         getattr(custom_parser, custom_parser_rule[key])(response))
                 break
-        # sel = Selector(response)
-        # for url in sel.xpath('//a/@href').extract():
-        #     url = urljoin(response.url, url)
-        #     yield Request(url, meta=cookie, callback=self.parse_item)
 
         for item in appItemList:
             yield item
@@ -76,16 +71,3 @@ class AndroidAppsSpider(CrawlSpider):
             appItem['url'] = url
             appItemList.append(appItem)
         return appItemList
-
-    #def parse_anzhi(self, response, xpath):
-    #    appItemList = []
-    #    hxs = HtmlXPathSelector(response)
-    #    for script in hxs.select(xpath).extract():
-    #        id = re.search(r"\d+", script).group()
-    #        url = "http://www.anzhi.com/dl_app.php?s=%s&n=5" % (id,)
-    #        appItem = AppItem()
-    #        appItem['url'] = url
-    #        appItemList.append(appItem)
-    #    return appItemList
-
-

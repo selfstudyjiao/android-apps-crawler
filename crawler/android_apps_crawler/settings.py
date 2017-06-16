@@ -11,6 +11,10 @@ BOT_NAME = 'android_apps_crawler'
 SPIDER_MODULES = ['android_apps_crawler.spiders']
 NEWSPIDER_MODULE = 'android_apps_crawler.spiders'
 USER_AGENT = "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.11(KHTML, like Gecko) Chrome/23.0.1271.97 Safari/537.11"
+
+# Obey robots.txt rules
+ROBOTSTXT_OBEY = True
+
 ITEM_PIPELINES = {
         'android_apps_crawler.pipelines.AppPipeline' : 1,
 }
@@ -20,6 +24,43 @@ MONGODB_DBNAME= 'GPLAY'
 MONGODB_DOCNAME= 'Apps'
 
 LOG_LEVEL = 'DEBUG'
+
+# Configure maximum concurrent requests performed by Scrapy (default: 16)
+#CONCURRENT_REQUESTS = 32
+
+# Configure a delay for requests for the same website (default: 0)
+# See http://scrapy.readthedocs.org/en/latest/topics/settings.html#download-delay
+# See also autothrottle settings and docs
+#DOWNLOAD_DELAY = 3
+# The download delay setting will honor only one of:
+    #CONCURRENT_REQUESTS_PER_DOMAIN = 16
+    #CONCURRENT_REQUESTS_PER_IP = 16
+
+# Disable cookies (enabled by default)
+#COOKIES_ENABLED = False
+
+# Disable Telnet Console (enabled by default)
+#TELNETCONSOLE_ENABLED = False
+
+# Override the default request headers:
+#DEFAULT_REQUEST_HEADERS = {
+#   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+#   'Accept-Language': 'en',
+#}
+
+# Enable or disable spider middlewares
+# See http://scrapy.readthedocs.org/en/latest/topics/spider-middleware.html
+#SPIDER_MIDDLEWARES = {
+#    'myFirstCrawler.middlewares.MyfirstcrawlerSpiderMiddleware': 543,
+#}
+
+# Enable or disable downloader middlewares
+# See http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
+#DOWNLOADER_MIDDLEWARES = {
+#    'myFirstCrawler.middlewares.MyCustomDownloaderMiddleware': 543,
+#}
+
+# Enable or disable extensions
 # DOWNLOADER_MIDDLEWARES = {
 #     'android_apps_crawler.middlewares.DownloaderMiddleware': 1,
 # }
@@ -28,6 +69,9 @@ LOG_LEVEL = 'DEBUG'
 # PROXIES = {
 #     'http' : '',
 # }
+
+# only crawl down to the 3rd level
+DEPTH_LIMITS = 2;
 
 ALLOWED_DOMAINS = {
     "appchina.com" : ["appchina.com",],
@@ -47,7 +91,7 @@ ALLOWED_DOMAINS = {
 }
 START_URLS = {
     "appchina.com" : ["http://www.appchina.com",],
-    "hiapk.com"    : ["http://apk.hiapk.com","http://apk.hiapk.com/appinfo/com.baidu.appsearch?planid=3953634",],
+    "hiapk.com"    : ["http://apk.hiapk.com",],
     "anzhi.com"    : ["http://www.anzhi.com",],
     "android.d.cn" : ["http://android.d.cn",],
     "mumayi.com"   : ["http://www.mumayi.com",],

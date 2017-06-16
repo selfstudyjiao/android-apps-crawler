@@ -1,6 +1,9 @@
 import re
+import logging
 
-from scrapy.spiders import Spider
+# from scrapy.spiders import Spider
+from scrapy.spiders import Rule, CrawlSpider
+from scrapy.linkextractors import LinkExtractor
 from scrapy.selector import Selector
 from scrapy.http import Request
 from scrapy.http import HtmlResponse
@@ -21,9 +24,12 @@ from android_apps_crawler import settings
 from android_apps_crawler import custom_parser
 
 
-class AndroidAppsSpider(Spider):
+class AndroidAppsSpider(CrawlSpider):
     name = "android_apps_spider"
     scrape_rules = settings.SCRAPE_RULES
+    rules = (
+        Rule(LinkExtractor(allow = ("http://apk\.hiapk\.com/appinfo",)), callback = 'parse_item', follow = True),
+    )
 
     def __init__(self, market=None, database_dir="../repo/databases/", *args, **kwargs):
         super(AndroidAppsSpider, self).__init__(*args, **kwargs)
@@ -31,9 +37,12 @@ class AndroidAppsSpider(Spider):
         self.start_urls = settings.START_URLS[market]
         settings.MARKET_NAME = market
         settings.DATABASE_DIR = database_dir
+        # self.rules = (
+        #     Rule(LinkExtractor(allow=settings.CRAWL_RULES[market]), callback = 'parse_item', follow = True),
+        # )
 
-    def parse(self, response):
-        response_domain = urlparse(response.url).netloc
+    def parse_item(self, response):
+        response_domain = urlparse.urlparse(response.url).netloc
         appItemList = []
         cookie = {}
         xpath_rule = self.scrape_rules['xpath']
@@ -48,48 +57,21 @@ class AndroidAppsSpider(Spider):
                 appItemList.extend(
                         getattr(custom_parser, custom_parser_rule[key])(response))
                 break
-        #if "appchina" in response_domain:
-        #    xpath = "//a[@id='pc-download' and @class='free']/@href"
-        #    appItemList.extend(self.parse_xpath(response, xpath))
-        #elif "hiapk" in response_domain:
-        #    xpath = "//a[@class='linkbtn d1']/@href"
-        #    appItemList.extend(self.parse_xpath(response, xpath))
-        #elif "android.d.cn" in response_domain:
-        #    xpath = "//a[@class='down']/@href"
-        #    appItemList.extend(self.parse_xpath(response, xpath))
-        #elif "anzhi" in response_domain:
-        #    xpath = "//div[@id='btn']/a/@onclick"
-        #    appItemList.extend(self.parse_anzhi(response, xpath))
-        #else:
-        #    pass
-        sel = Selector(response)
-        for url in sel.xpath('//a/@href').extract():
-            url = urljoin(response.url, url)
-            yield Request(url, meta=cookie, callback=self.parse)
+        # sel = Selector(response)
+        # for url in sel.xpath('//a/@href').extract():
+        #     url = urljoin(response.url, url)
+        #     yield Request(url, meta=cookie, callback=self.parse_item)
 
         for item in appItemList:
             yield item
 
 
-    #def parse_appchina(self, response):
-    #    appItemList = []
-    #    hxs = HtmlXPathSelector(response)
-    #    for url in hxs.select(
-    #        "//a[@id='pc-download' and @class='free']/@href"
-    #        ).extract():
-    #        url = urljoin(response.url, url)
-    #        log.msg("Catch an application: %s" % url, level=log.INFO)
-    #        appItem = AppItem()
-    #        appItem['url'] = url
-    #        appItemList.append(appItem)
-    #    return appItemList
-
     def parse_xpath(self, response, xpath):
         appItemList = []
         sel = Selector(response)
-        for url in sel.xpath(xpath).extract():
+        for url in response.xpath(xpath).extract():
             url = urljoin(response.url, url)
-            log.msg("Catch an application: %s" % url, level=log.INFO)
+            logging.info("Catch an application: %s", url)
             appItem = AppItem()
             appItem['url'] = url
             appItemList.append(appItem)

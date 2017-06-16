@@ -6,6 +6,7 @@
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 
 import pymongo
+import logging
 
 from scrapy.conf import settings
 
@@ -19,13 +20,13 @@ class AppPipeline(object):
         self.post = tdb[settings['MONGODB_DOCNAME']]
 
     def process_item(self, item, spider):
-        valid = TRUE
+        valid = True
         for data in item:
             if not data:
                 valid = False
                 raise DropItem("Missing {0}!".format(data))
         if valid:
             self.post.insert(dict(item))
-            log.msg("One record added to MongoDB!", level=log.DEBUG, spider=spider)
+            logging.info("One record added to MongoDB!")
 
         return item

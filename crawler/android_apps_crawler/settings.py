@@ -19,7 +19,7 @@ MONGODB_PORT = 27017
 MONGODB_DBNAME= 'GPLAY'
 MONGODB_DOCNAME= 'Apps'
 
-LOG_LEVEL = 'INFO'
+LOG_LEVEL = 'DEBUG'
 # DOWNLOADER_MIDDLEWARES = {
 #     'android_apps_crawler.middlewares.DownloaderMiddleware': 1,
 # }
@@ -31,7 +31,7 @@ LOG_LEVEL = 'INFO'
 
 ALLOWED_DOMAINS = {
     "appchina.com" : ["appchina.com",],
-    "hiapk.com"    : ["hiapk.com",],
+    "hiapk.com"    : ["apk.hiapk.com",],
     "anzhi.com"    : ["anzhi.com",],
     "android.d.cn" : ["android.d.cn",],
     "mumayi.com"   : ["mumayi.com",],
@@ -47,7 +47,7 @@ ALLOWED_DOMAINS = {
 }
 START_URLS = {
     "appchina.com" : ["http://www.appchina.com",],
-    "hiapk.com"    : ["http://apk.hiapk.com/himarket",],
+    "hiapk.com"    : ["http://apk.hiapk.com","http://apk.hiapk.com/appinfo/com.baidu.appsearch?planid=3953634",],
     "anzhi.com"    : ["http://www.anzhi.com",],
     "android.d.cn" : ["http://android.d.cn",],
     "mumayi.com"   : ["http://www.mumayi.com",],
@@ -80,6 +80,9 @@ SCRAPE_RULES = {
     "custom_parser" : {
         "anzhi" : "parse_anzhi",
     },
+}
+CRAWL_RULES = {
+    "hiapk.com"    : ["http://apk\.hiapk\.com/appinfo",],
 }
 DATABASE_DIR = "../repo/databases/"
 MARKET_NAME = ""

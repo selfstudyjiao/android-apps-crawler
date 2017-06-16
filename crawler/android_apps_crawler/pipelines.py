@@ -1,59 +1,31 @@
-from scrapy import signals
-from scrapy.xlib.pydispatch import dispatcher
-from scrapy import log
+# -*- coding: utf-8 -*-
 
-import sqlite3
-from os import path
-from android_apps_crawler import settings
+# Define your item pipelines here
+#
+# Don't forget to add your pipeline to the ITEM_PIPELINES setting
+# See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 
+import pymongo
+
+from scrapy.conf import settings
 
 class AppPipeline(object):
-    def process_item(self, item, spider):
-        log.msg("Catch an AppItem", level=log.INFO)
-        return item
-
-class SQLitePipeline(object):
-    filename = ''
-    conn = None
     def __init__(self):
-        self.filename += settings.MARKET_NAME
-        self.filename += ".db"
-        self.filename = path.join(settings.DATABASE_DIR, self.filename)
-        print self.filename
-        self.conn = None
-        dispatcher.connect(self.initialize, signals.engine_started)
-        dispatcher.connect(self.finalize, signals.engine_stopped)
+        host = settings['MONGODB_HOST']
+        port = settings['MONGODB_PORT']
+        dbName = settings['MONGODB_DBNAME']
+        client = pymongo.MongoClient(host=host, port=port)
+        tdb = client[dbName]
+        self.post = tdb[settings['MONGODB_DOCNAME']]
 
     def process_item(self, item, spider):
-        try:
-            self.conn.execute('insert into apps(url) values(?)',
-                        (item['url'],)
-                    )
-            self.conn.commit()
-            log.msg("Inserting into database");
-        except sqlite3.IntegrityError:
-            print "Duplicated"
+        valid = TRUE
+        for data in item:
+            if not data:
+                valid = False
+                raise DropItem("Missing {0}!".format(data))
+        if valid:
+            self.post.insert(dict(item))
+            log.msg("One record added to MongoDB!", level=log.DEBUG, spider=spider)
+
         return item
-
-    def initialize(self):
-        if path.exists(self.filename):
-            self.conn = sqlite3.connect(self.filename)
-        else:
-            self.create_table()
-        self.conn.execute("PRAGMA journal_mode=WAL;")
-        self.conn.commit()
-
-    def finalize(self):
-        if self.conn is not None:
-            self.conn.commit()
-            self.conn.close()
-            self.conn = None
-
-    def create_table(self):
-        self.conn = sqlite3.connect(self.filename)
-        self.conn.execute("create table apps( \
-                id integer primary key autoincrement, \
-                url varchar(100) not null unique, \
-                downloaded int default 0)"
-            )
-        self.conn.commit()

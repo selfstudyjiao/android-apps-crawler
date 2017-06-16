@@ -1,4 +1,6 @@
 *.pyc
 .scrapy
+*.swp
 repo/databases
 repo/apps
+crawler/job_*

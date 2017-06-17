@@ -126,7 +126,7 @@ SCRAPE_RULES = {
     },
 }
 CRAWL_RULES = {
-    "hiapk.com"    : ["http://apk\.hiapk\.com/appinfo",],
+    "hiapk.com"   : ["http://apk\.hiapk\.com/appinfo",],
 }
 DATABASE_DIR = "../repo/databases/"
 MARKET_NAME = ""

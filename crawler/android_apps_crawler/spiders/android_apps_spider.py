@@ -26,19 +26,24 @@ from android_apps_crawler import custom_parser
 class AndroidAppsSpider(CrawlSpider):
     name = "android_apps_spider"
     scrape_rules = settings.SCRAPE_RULES
-    rules = (
-        Rule(LinkExtractor(allow = ("http://apk\.hiapk\.com/appinfo",)), callback = 'parse_item', follow = True),
-    )
+    # rules = (
+    #     Rule(LinkExtractor(allow = ("http://apk\.hiapk\.com/appinfo",)), callback = 'parse_item', follow = True),
+    # )
 
     def __init__(self, market=None, database_dir="../repo/databases/", *args, **kwargs):
         super(AndroidAppsSpider, self).__init__(*args, **kwargs)
+
+        # need to define rules as class variable since it gets compiled in parent class
+        AndroidAppsSpider.rules = (
+            Rule(LinkExtractor(allow=settings.CRAWL_RULES[market]), callback = 'parse_item', follow = True),
+        #    Rule(LinkExtractor(allow = ("http://apk\.hiapk\.com/appinfo",)), callback = 'parse_item', follow = True),
+        )
+        super(AndroidAppsSpider, self)._compile_rules()
+
         self.allowed_domains = settings.ALLOWED_DOMAINS[market]
         self.start_urls = settings.START_URLS[market]
         settings.MARKET_NAME = market
         settings.DATABASE_DIR = database_dir
-        # self.rules = (
-        #     Rule(LinkExtractor(allow=settings.CRAWL_RULES[market]), callback = 'parse_item', follow = True),
-        # )
 
     def parse_item(self, response):
         response_domain = urlparse.urlparse(response.url).netloc

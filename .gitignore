@@ -1,6 +1,8 @@
 *.pyc
 .scrapy
 *.swp
+.ipynb*
+*.ipynb*
 repo/databases
 repo/apps
 crawler/job_*

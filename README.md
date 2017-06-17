@@ -1,6 +1,16 @@
 Android Apps Crawler
 ====================
-
+Acknowledgement
+---------------
+This source code is modified from [mssun/android-apps-crawler](https://github.com/mssun/android-apps-crawler)
+The REAME is updated with current status
+Updates (On going)
+------------------
+* Updated the Xpath rules defined in settings.py (the original ones don't work any more)
+    * Hiapk: http://apk.hiapk.com (hiapk.com)
+* Switched to MongoDB for both crawler and downloader
+* Modified android_apps_spider.py to use CrawlSpider with rules
+    
 Overview
 --------
 Android Apps Crawler is an extensible crawler for downloading Android applications in the third-party markets.
@@ -9,25 +19,58 @@ into repository.
 
 Requirements
 ------------
-* Python 2.6 or up
-* Scrapy 0.22 or up: http://scrapy.org (didn't have a full test in lower version.)
+* MongoDB
+* Python 2.6 or up, not work for python 3
+* Scrapy 0.22 or up: http://scrapy.org 
 * Works on Linux, Windows, Mac OSX, BSD
 * Currently, downloader cannot work on Windows.
-* For Ubuntu users, "Don't use the python-scrapy package provided by Ubuntu, 
-they are typically too old and slow to catch up with latest Scrapy. 
-Instead, use the official [Ubuntu Packages](http://doc.scrapy.org/en/latest/topics/ubuntu.html#topics-ubuntu)."
 
+File Structure
+--------------
+```
+android-apps-crawler
+|   README.md
+|   startmongodb.sh
+|
+|---crawler
+|   |   crawl.sh
+|   |   scrapy.cfg
+|   |  
+|---+--android_apps_crawler
+|      |   custom_parser.py
+|      |   items.py
+|      |   middlewares.py
+|      |   pipeline.py
+|      |   settings.py
+|      |   __init__.py
+|      |
+|      +---spiders
+|              android_apps_spider.py 
+|
+|------<web_site> (used to store the current status for pause/resume)
+|
+|---downloader
+|       downloader.py
++---repo
+        apps (store the downloaded APK files)
+        databases
+
+```
 Usage
 -----
 * Set the third-party markets you want to crawl in settings.py
 * Set the proxy if you have
+* start mongoDB manually if needed. DB path is ./repo/database
+```
+./startmongodb.sh
+```
 * Start crawler: 
 ```
-./crawl.sh <market name>
+./crawler/crawl.sh <market name>
 ```
 * Start downloader:
 ```
-./downloader.py <database file path> <output directory>
+./downloader/downloader.py <database IP:PORT> <DBName:DOCName> <output directory>
 ```
 
 Settings
@@ -36,17 +79,17 @@ You can set proxy, user-agen, database name, etc in ```crawler/android_apps_craw
 
 Supported Third-party Markets (market names used in crawl.sh)
 -----------------------------
-* AppChina: http://www.appchina.com (appchina.com)
+* [Invalid] AppChina: http://www.appchina.com (appchina.com)
 * Hiapk: http://apk.hiapk.com (hiapk.com)
-* Anzhi: http://www.anzhi.com (anzhi.com)
-* android.d.cn: http://android.d.cn (android.d.cn)
-* mumayi: http://www.mumayi.com (mumayi.com)
-* gfan: http://apk.gfan.com (gfan.com)
-* nduoa: http://www.nduoa.com (nduoa.com)
-* 3gyu: http://www.3gyu.com (3gyu.com)
-* angeeks: http://apk.angeeks.com (angeeks.com)
-* appfun: http://www.appfun.cn (appfun.cn)
-* jimi168: http://www.jimi168.com (jimi168.com)
+* [Invalid] Anzhi: http://www.anzhi.com (anzhi.com)
+* [Invalid] android.d.cn: http://android.d.cn (android.d.cn)
+* [Invalid] mumayi: http://www.mumayi.com (mumayi.com)
+* [Invalid] gfan: http://apk.gfan.com (gfan.com)
+* [Invalid] nduoa: http://www.nduoa.com (nduoa.com)
+* [Invalid] 3gyu: http://www.3gyu.com (3gyu.com)
+* [Invalid] angeeks: http://apk.angeeks.com (angeeks.com)
+* [Invalid] appfun: http://www.appfun.cn (appfun.cn)
+* [Invalid] jimi168: http://www.jimi168.com (jimi168.com)
 * Keep adding...
 
 More Android Markets

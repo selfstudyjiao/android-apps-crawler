@@ -9,13 +9,15 @@ import os
 import hashlib
 import signal
 import Queue
+import pymongo
+import logging
 
 NUM_THREAD = 20
 work_queue_lock = threading.Lock()
 update_database_lock = threading.Lock()
 
 class Downloader(threading.Thread):
-    def __init__(self, work_queue, output_dir, database_filepath):
+    def __init__(self, work_queue, output_dir, dbip_port, db_doc):
         threading.Thread.__init__(self)
         self.exit_event = threading.Event()
         self.work_queue = work_queue
@@ -25,7 +27,13 @@ class Downloader(threading.Thread):
         self.output_dir = output_dir
         self.current_file_size = 0
         self.file_size = 0
-        self.database_filepath = database_filepath
+        self.dbip_port = dbip_port
+        self.db_doc = db_doc
+        (self.host, self.port) = dbip_port.split(':')
+        self.port = int(self.port)
+        (self.dbName, self.docname) = db_doc.split(':')
+        logging.info('host:%s', self.host)
+
 
     def exit(self):
         print("%s: asked to exit." % self.getName())
@@ -70,8 +78,14 @@ class Downloader(threading.Thread):
         urllib2.install_opener(opener)
         opening = urllib2.urlopen(self.url)
         meta = opening.info()
+        # get the downloaed file name
+        downloadurl = opening.url
+        download_file_name = os.path.basename(downloadurl)
+
         self.file_size = int(meta.getheaders("Content-Length")[0])
-        temp_file_name = "%d.apk" % (time.time() * 1000000)
+        # use the same downloaded file name provied by the website
+        temp_file_name = download_file_name
+        # temp_file_name = "%d.apk" % (time.time() * 1000000)
         temp_dir = self.output_dir + os.sep + "temp"
         self.temp_output_path = temp_dir + os.sep + temp_file_name
         with open(self.temp_output_path, 'wb') as fil:
@@ -97,15 +111,14 @@ class Downloader(threading.Thread):
     def update_database(self, result=1):
         update_database_lock.acquire()
         try:
-            connection = sqlite3.connect(self.database_filepath)
-            cursor = connection.cursor()
-            cursor.execute('update apps set downloaded = ? where url = ?',
-                    (result, self.url,))
-            connection.commit()
-        except sqlite3.OperationalError:
-            print("%s: Operational Error" % (self.getName()))
+            client = pymongo.MongoClient(host=self.host, port=self.port)
+            tdb = client[self.dbName]
+            tdbdoc = tdb[self.docname]
+            tdbdoc.update({'url':self.url}, {'$set':{'downloaded':result}})
+        except pymongo.errors.ConnectionFailure, e:
+            print("%s: Operational Error" % e)
         finally:
-            connection.close()
+            client.close()
             update_database_lock.release()
 
 class Monitor(threading.Thread):
@@ -126,27 +139,32 @@ class Monitor(threading.Thread):
             print("")
             time.sleep(1)
 
-def get_undownloaded_url(database_filepath):
+def get_undownloaded_url(dbip_port, db_doc):
     undownloaded_urls = []
+    (host, port) = dbip_port.split(':')
+    port = int(port)
+    (dbName, docname) = db_doc.split(':')
+
     try:
-        connection = sqlite3.connect(database_filepath)
-        cursor = connection.cursor()
-        sql = "select * from apps where downloaded = 0"
-        cursor.execute(sql)
-        records = cursor.fetchall()
-        undownloaded_urls = [r[1] for r in records]
-    except sqlite3.OperationalError:
-        print("get_undownloaded_url(): Operational Error.")
+        client = pymongo.MongoClient(host=host, port=port)
+        tdb = client[dbName]
+        tdbdoc = tdb[docname]
+        # need to change to list from cursor type
+        records = list(tdbdoc.find({'downloaded':{'$ne':1}}))
+        undownloaded_urls = [r['url'] for r in records] 
+    except pymongo.errors.ConnectionFailure, e:
+        print("%s: get_undownloaded_url() Operational Error" % e)
     finally:
-        connection.close()
+        client.close()
+
     return undownloaded_urls
 
 def fill_work_queue(work_queue, undownloaded_urls):
     for u in undownloaded_urls:
         work_queue.put(u)
 
-def import_work(work_queue, database_filepath):
-    undownloaded_urls = get_undownloaded_url(database_filepath)
+def import_work(work_queue, dbip_port, db_doc):
+    undownloaded_urls = get_undownloaded_url(dbip_port, db_doc)
     fill_work_queue(work_queue, undownloaded_urls)
     return len(undownloaded_urls)
 
@@ -195,12 +213,13 @@ class Watcher:
         except OSError: pass
 
 def main():
-    if len(sys.argv) < 2:
-        print("Usage: %s <SQLite database> <output directory>" % (sys.argv[0]))
+    if len(sys.argv) < 3:
+        print("Usage: %s <MongoDB_ip:port> <dbname:docname> <output directory>" % (sys.argv[0]))
         sys.exit(1)
     else:
-        database_filepath = sys.argv[1]
-        output_dir = sys.argv[2]
+        dbip_port = sys.argv[1]
+        db_doc = sys.argv[2]
+        output_dir = sys.argv[3]
 
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
@@ -211,7 +230,7 @@ def main():
     threads = []
     work_queue = Queue.Queue()
     for i in range(NUM_THREAD):
-        t = Downloader(work_queue, output_dir, database_filepath)
+        t = Downloader(work_queue, output_dir, dbip_port, db_doc)
         t.daemon = True
         t.start()
         threads.append(t)
@@ -221,7 +240,7 @@ def main():
 
     exit_flag = 0
     while exit_flag < 2:
-        import_work(work_queue, database_filepath)
+        import_work(work_queue, dbip_port, db_doc)
         if work_queue.empty():
             exit_flag += 1
         else:

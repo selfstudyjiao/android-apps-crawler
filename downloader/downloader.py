@@ -214,7 +214,7 @@ class Watcher:
 
 def main():
     if len(sys.argv) < 3:
-        print("Usage: %s <MongoDB_ip:port> <dbname:docname> <output directory>" % (sys.argv[0]))
+        print("Usage: %s <"MongoDB_ip:port"> <"dbname:docname"> <"output directory">" % (sys.argv[0]))
         sys.exit(1)
     else:
         dbip_port = sys.argv[1]

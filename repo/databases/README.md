@@ -1,1 +1,1 @@
-SQLite database files will be stored in this directory.
+Mongo database files will be stored in this directory.

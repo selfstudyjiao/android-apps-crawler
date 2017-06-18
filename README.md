@@ -1,9 +1,11 @@
 Android Apps Crawler
 ====================
+
 Acknowledgement
 ---------------
-This source code is modified from [mssun/android-apps-crawler](https://github.com/mssun/android-apps-crawler)
-The REAME is updated with current status
+* This source code is modified from [mssun/android-apps-crawler](https://github.com/mssun/android-apps-crawler)
+* The REAME is updated with current status
+
 Updates (On going)
 ------------------
 * Updated the Xpath rules defined in settings.py (the original ones don't work any more)
@@ -70,7 +72,8 @@ Usage
 ```
 * Start downloader:
 ```
-./downloader/downloader.py <database IP:PORT> <DBName:DOCName> <output directory>
+./downloader/download.sh 
+./downloader/download.sh <database IP:PORT> <DBName:DOCName> <output directory>
 ```
 
 Settings

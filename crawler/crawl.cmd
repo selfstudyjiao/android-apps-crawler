@@ -1,3 +1,4 @@
+@echo off
 if "%1"=="" (
     ECHO "Usage: %0 <market name> [database output directory]"
     ECHO "   market name:"

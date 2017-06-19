@@ -22,7 +22,7 @@ into repository.
 Requirements
 ------------
 * MongoDB
-* Python 2.6 or up, not work for python 3
+* Python 2.6 or up or Python 3.5
 * Scrapy 0.22 or up: http://scrapy.org 
 * Works on Linux, Windows, Mac OSX, BSD
 * Currently, downloader cannot work on Windows.

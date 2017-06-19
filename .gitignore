@@ -3,7 +3,7 @@
 *.swp
 .ipynb*
 *.ipynb*
-repo/databases/
+repo/databases/*
 repo/apps/*.apk
 repo/apps/t*
 crawler/job_*

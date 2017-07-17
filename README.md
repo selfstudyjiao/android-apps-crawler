@@ -38,18 +38,18 @@ android-apps-crawler
 |   |   crawl.sh
 |   |   scrapy.cfg
 |   |  
-|---+--android_apps_crawler
-|      |   custom_parser.py
-|      |   items.py
-|      |   middlewares.py
-|      |   pipeline.py
-|      |   settings.py
-|      |   __init__.py
-|      |
-|      +---spiders
-|              android_apps_spider.py 
-|
-|------<web_site> (used to store the current status for pause/resume)
+|   +--android_apps_crawler
+|   |  |   custom_parser.py
+|   |  |   items.py
+|   |  |   middlewares.py
+|   |  |   pipeline.py
+|   |  |   settings.py
+|   |  |   __init__.py
+|   |  |
+|   |  +---spiders
+|   |          android_apps_spider.py 
+|   |
+|   +--<web_site> (used to store the current status for pause/resume)
 |
 |---downloader
 |       downloader.py
